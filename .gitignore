@@ -1,0 +1,32 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.swp
+.DS_Store
+
+# NLTK data (if storing locally)
+nltk_data/
+
+# Environment / Virtualenv
+env/
+venv/
+.venv/
+
+# Jupyter/IPython checkpoints
+.ipynb_checkpoints/
+
+# Streamlit static file directories
+.streamlit/
+
+# OS-generated files
+Thumbs.db
+*.DS_Store
+
+# Log files
+*.log
+
+# Local dev config
+*.local
+
+# Environment variable file (keys, secrets)
+.env

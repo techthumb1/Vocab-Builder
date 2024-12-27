@@ -1,0 +1,7 @@
+# Install the required packages
+streamlit==1.27.2
+nltk==3.8.1
+sentence-transformers==2.2.2
+transformers==4.31.0
+torch>=1.9.0
+requests==2.31.0
