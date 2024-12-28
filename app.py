@@ -1,8 +1,10 @@
 import os
+os.environ['NLTK_DATA'] = '/mount/src/wordsage/nltk_data'
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 import nltk
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
-nltk.download('wordnet')
+for resource in ['punkt', 'averaged_perceptron_tagger', 'wordnet', 'omw-1.4']:
+    nltk.download(resource, download_dir=os.environ['NLTK_DATA'])
 
 import streamlit as st
 from src.data_manager import initialize_nltk_data
@@ -16,8 +18,6 @@ from src.synonyms import synonyms_from_wordnet, contextual_synonyms
 from src.embeddings import TransformerSynonymFinder
 from src.llm_integration import llm_writing_advice
 from src.feedback import record_like, get_likes
-
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 initialize_nltk_data()
 
