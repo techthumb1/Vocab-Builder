@@ -13,6 +13,9 @@ from src.embeddings import TransformerSynonymFinder
 from src.llm_integration import llm_writing_advice
 from src.feedback import record_like, get_likes
 
+initialize_nltk_data()  # 
+
+
 # Main function for the Streamlit app
 def main():
     st.title("WordSage")
