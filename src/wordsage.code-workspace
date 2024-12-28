@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../nltk_data"
+		}
+	],
+	"settings": {}
+}

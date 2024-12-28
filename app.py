@@ -1,99 +1,102 @@
 import streamlit as st
 from src.data_manager import initialize_nltk_data
-from src.definitions import definitions_from_wordnet, examples_from_wordnet, antonyms_from_wordnet
+from src.dict_enrichment import (
+    fetch_dictionary_data,
+    parse_pronunciation,
+    parse_etymology,
+    parse_meanings
+)
 from src.synonyms import synonyms_from_wordnet, contextual_synonyms
 from src.embeddings import TransformerSynonymFinder
-from src.llm_integration import predictive_text, generative_synonyms
+from src.llm_integration import llm_writing_advice
 from src.feedback import record_like, get_likes
 
 def main():
-    st.title("Advanced Dictionary–Thesaurus with LLM & Embeddings")
-    st.write(
-        "Combines classical WordNet lookups with transformer embeddings and "
-        "LLM-based predictive text/generative synonyms."
+    st.title("WordSage")
+    st.caption("A multi-faceted word analysis tool")
+    st.write("""
+    This app offers:
+    1. Dictionary enrichment with pronunciation, etymology, usage.
+    2. WordNet synonyms (basic & contextual).
+    3. Optional advanced synonyms ranking with transformer embeddings.
+    4. LLM-based writing advice (synonyms, usage contexts, structure tips).
+    """)
+
+    initialize_nltk_data()
+    finder = TransformerSynonymFinder()
+
+    user_word = st.text_input(
+        label="Word",
+        placeholder="Enter a word (e.g. 'sesquipedalian')"
     )
 
-    # Ensure NLTK is initialized
-    initialize_nltk_data()
+    user_sentence = st.text_input(
+        label="Contextual Sentence",
+        placeholder="Enter a sentence for context"
+    )
 
-    # Word input
-    user_word = st.text_input("Enter a word to analyze:", value="fast")
-    user_sentence = st.text_input("Enter a sentence for context (optional):", value="He likes to fast before a big race.")
-    
-    # Partial text for predictive completion
-    partial_text = st.text_input("Predictive text (start writing something):", value="Today I want to")
-
-    # On button click, do all dictionary–thesaurus tasks
-    if st.button("Analyze"):
+    if st.button("Analyze Word"):
         if not user_word.strip():
             st.warning("Please enter a valid word.")
             return
 
-        # 1. Definitions, examples, antonyms
-        st.subheader("Definitions")
-        defs = definitions_from_wordnet(user_word)
-        if defs:
-            for d in defs:
-                st.write(f"- {d}")
+        st.subheader("Dictionary Enrichment")
+        dict_data = fetch_dictionary_data(user_word.lower())
+        if dict_data:
+            pron = parse_pronunciation(dict_data)
+            if pron:
+                st.write(f"**Pronunciation**: {pron}")
+
+            origin = parse_etymology(dict_data)
+            if origin:
+                st.write(f"**Etymology**: {origin}")
+
+            meanings = parse_meanings(dict_data)
+            if meanings:
+                st.write("**Detailed Meanings**:")
+                for pos, entries in meanings.items():
+                    st.markdown(f"**{pos}**")
+                    for i, e in enumerate(entries, start=1):
+                        st.write(f"- Definition {i}: {e['definition']}")
+                        if e["example"]:
+                            st.write(f"  Example: _{e['example']}_")
+                        if e["synonyms"]:
+                            st.write(f"  Synonyms: {e['synonyms']}")
         else:
-            st.write("No definitions found.")
+            st.write("No dictionary data found from the external API.")
 
-        st.subheader("Examples")
-        exs = examples_from_wordnet(user_word)
-        if exs:
-            for e in exs:
-                st.write(f"- {e}")
-        else:
-            st.write("No examples found.")
-
-        st.subheader("Antonyms")
-        ants = antonyms_from_wordnet(user_word)
-        st.write(ants if ants else "No antonyms found.")
-
-        # 2. Basic synonyms & contextual synonyms
-        st.subheader("Basic Synonyms (WordNet)")
-        basic_syns = synonyms_from_wordnet(user_word)
+        st.subheader("WordNet Synonyms")
+        basic_syns = synonyms_from_wordnet(user_word.lower())
         if basic_syns:
             st.write(basic_syns)
+            if user_sentence.strip():
+                ranked_syns = finder.rank_synonyms(basic_syns, context=user_sentence, top_n=5)
+                st.subheader("Advanced Synonyms (Embedding-based)")
+                if ranked_syns:
+                    for syn in ranked_syns:
+                        like_count = get_likes(user_word, syn)
+                        st.write(f"- {syn} (likes: {like_count})")
+                        if st.button(f"Like '{syn}'", key=f"like_{syn}"):
+                            record_like(user_word, syn)
+                            st.experimental_rerun()
         else:
-            st.write("No synonyms found.")
+            st.write("No basic synonyms found.")
 
         if user_sentence.strip():
             st.subheader("Contextual Synonyms (POS-based)")
-            c_syns = contextual_synonyms(user_sentence, user_word)
-            st.write(c_syns if c_syns else "No contextual synonyms found.")
+            c_syns = contextual_synonyms(user_sentence, user_word.lower())
+            if c_syns:
+                st.write(c_syns)
+            else:
+                st.write("No contextual synonyms found for that sentence.")
 
-        # 3. Transformer-based advanced synonyms
-        st.subheader("Advanced Synonyms (Embedding-based)")
-        finder = TransformerSynonymFinder()
-        advanced = finder.rank_synonyms_by_context(user_word, user_sentence, top_n=5)
-        if advanced:
-            for syn in advanced:
-                like_count = get_likes(user_word, syn)
-                st.write(f"- {syn} (likes: {like_count})")
-                if st.button(f"Like '{syn}'", key=syn):
-                    record_like(user_word, syn)
-                    st.experimental_rerun()  # So we see updated like count immediately
-        else:
-            st.write("No advanced synonyms found.")
-    
-    # 4. Predictive text (LLM-based)
-    if st.button("Predict Next Words"):
-        if partial_text.strip():
-            completion = predictive_text(partial_text)
-            st.subheader("Predictive Text Output")
-            st.write(partial_text + completion)
-        else:
-            st.warning("Provide partial text to predict from.")
-
-    # 5. Generative synonyms via LLM
-    if st.button("Generate Synonyms"):
-        if user_word.strip():
-            gen_syn_output = generative_synonyms(user_word, user_sentence)
-            st.subheader("LLM-based Generative Synonyms/Expressions")
-            st.write(gen_syn_output)
-        else:
-            st.warning("Enter a valid word to generate synonyms.")
+    if st.button("Generate Enhancements"):
+        if not user_word.strip():
+            st.warning("Please enter a word first.")
+            return
+        st.subheader("LLM-Based Writing Advice")
+        advice_text = llm_writing_advice(user_word, user_sentence)
+        st.write(advice_text)
 
 if __name__ == "__main__":
     main()

@@ -1,8 +1,9 @@
-# Advanced Dictionary–Thesaurus with LLM & Embeddings
+# WordSage
+### A modern advanced dictionary–thesaurus
 
 ## Overview
 
-This application provides classical dictionary/thesaurus functionality using WordNet and advanced NLP features with transformer embeddings and LLMs via Hugging Face Inference API.
+ WordSage is an advanced dictionary–thesaurus with LLM & embeddings.The application provides classical dictionary/thesaurus functionality using WordNet and advanced NLP features with transformer embeddings and LLMs via Hugging Face Inference API.
 
 ## Requirements
 
@@ -15,8 +16,8 @@ This application provides classical dictionary/thesaurus functionality using Wor
 **Clone the repo**:
 
    ```bash
-   git clone https://github.com/yourusername/my-advanced-dictionary-thesaurus.git
-   cd my-advanced-dictionary-thesaurus
+   git clone https://github.com/yourusername/WordSage.git
+   cd wordsage
 ```
 
 ## Run the application
