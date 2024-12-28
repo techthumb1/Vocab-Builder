@@ -11,6 +11,7 @@ nltk_data/
 env/
 venv/
 .venv/
+wordsage/
 
 # Jupyter/IPython checkpoints
 .ipynb_checkpoints/

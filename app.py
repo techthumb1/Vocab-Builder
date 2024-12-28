@@ -1,4 +1,6 @@
 import streamlit as st
+import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 from src.data_manager import initialize_nltk_data
 from src.dict_enrichment import (
     fetch_dictionary_data,
@@ -11,6 +13,7 @@ from src.embeddings import TransformerSynonymFinder
 from src.llm_integration import llm_writing_advice
 from src.feedback import record_like, get_likes
 
+# Main function for the Streamlit app
 def main():
     st.title("WordSage")
     st.caption("A multi-faceted word analysis tool")
@@ -22,9 +25,13 @@ def main():
     4. LLM-based writing advice (synonyms, usage contexts, structure tips).
     """)
 
+    # Initialize NLTK data
     initialize_nltk_data()
+
+    # Initialize Synonym Finder
     finder = TransformerSynonymFinder()
 
+    # Input fields
     user_word = st.text_input(
         label="Word",
         placeholder="Enter a word (e.g. 'sesquipedalian')"
@@ -35,6 +42,7 @@ def main():
         placeholder="Enter a sentence for context"
     )
 
+    # Analyze button
     if st.button("Analyze Word"):
         if not user_word.strip():
             st.warning("Please enter a valid word.")
@@ -90,13 +98,18 @@ def main():
             else:
                 st.write("No contextual synonyms found for that sentence.")
 
+    # Generate Enhancements button
     if st.button("Generate Enhancements"):
         if not user_word.strip():
             st.warning("Please enter a word first.")
             return
         st.subheader("LLM-Based Writing Advice")
-        advice_text = llm_writing_advice(user_word, user_sentence)
-        st.write(advice_text)
+        with st.spinner("Generating advice..."):
+            try:
+                advice_text = llm_writing_advice(user_word, user_sentence)
+                st.write(advice_text)
+            except Exception as e:
+                st.error(f"Error generating advice: {e}")
 
 if __name__ == "__main__":
     main()
