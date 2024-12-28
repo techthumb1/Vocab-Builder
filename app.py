@@ -1,3 +1,7 @@
+import nltk
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('wordnet')
 import streamlit as st
 import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -12,10 +16,7 @@ from src.synonyms import synonyms_from_wordnet, contextual_synonyms
 from src.embeddings import TransformerSynonymFinder
 from src.llm_integration import llm_writing_advice
 from src.feedback import record_like, get_likes
-import nltk
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
-nltk.download('wordnet')
+
 initialize_nltk_data()
 
 
