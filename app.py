@@ -1,10 +1,10 @@
+import os
 import nltk
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('wordnet')
+
 import streamlit as st
-import os
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
 from src.data_manager import initialize_nltk_data
 from src.dict_enrichment import (
     fetch_dictionary_data,
@@ -17,8 +17,9 @@ from src.embeddings import TransformerSynonymFinder
 from src.llm_integration import llm_writing_advice
 from src.feedback import record_like, get_likes
 
-initialize_nltk_data()
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
+initialize_nltk_data()
 
 # Main function for the Streamlit app
 def main():
