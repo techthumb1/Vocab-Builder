@@ -1,10 +1,15 @@
 import os
+import nltk  # Import nltk here before using it
+
+# Add NLTK data path
 nltk.data.path.append(os.path.join(os.path.dirname(__file__), 'nltk_data'))
+
+# Set environment variable to prevent tokenizer parallelism warning
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-import nltk
+# Download required NLTK resources
 for resource in ['punkt', 'averaged_perceptron_tagger', 'wordnet', 'omw-1.4']:
-    nltk.download(resource, download_dir=os.environ['NLTK_DATA'])
+    nltk.download(resource, download_dir=os.path.join(os.path.dirname(__file__), 'nltk_data'), quiet=True)
 
 import streamlit as st
 from src.data_manager import initialize_nltk_data
