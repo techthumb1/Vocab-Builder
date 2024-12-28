@@ -1,7 +1,15 @@
 import nltk
+import os
 from nltk.corpus import wordnet
 from nltk import pos_tag, word_tokenize
 
+# Set NLTK data path and download required data
+nltk_data_dir = os.path.join(os.getcwd(), 'nltk_data')
+os.makedirs(nltk_data_dir, exist_ok=True)
+nltk.data.path.append(nltk_data_dir)
+
+for resource in ['punkt', 'averaged_perceptron_tagger', 'wordnet', 'omw-1.4']:
+    nltk.download(resource, quiet=True, download_dir=nltk_data_dir)
 def _wordnet_pos(treebank_tag: str):
     """
     Maps POS tags from Treebank to WordNet's format.
