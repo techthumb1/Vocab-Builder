@@ -1,5 +1,5 @@
 import os
-os.environ['NLTK_DATA'] = '/mount/src/wordsage/nltk_data'
+nltk.data.path.append(os.path.join(os.path.dirname(__file__), 'nltk_data'))
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 import nltk

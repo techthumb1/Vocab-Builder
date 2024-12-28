@@ -1,8 +1,10 @@
+import os
 import nltk
 import streamlit as st
 
 @st.cache_resource
 def initialize_nltk_data():
+    nltk.data.path.append(os.path.join(os.path.dirname(__file__), 'nltk_data'))
     """
     Ensures NLTK data (WordNet, POS tagger, tokenizer) is installed
     and loaded in a cached manner so it's not repeated on each run.
