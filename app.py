@@ -1,3 +1,6 @@
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="torch")
+
 import os
 import nltk  # Import nltk here before using it
 
